@@ -32,6 +32,8 @@
 const FName AChaosVehiclesPawn::LookUpBinding("LookUp");
 const FName AChaosVehiclesPawn::LookRightBinding("LookRight");
 const FName AChaosVehiclesPawn::EngineAudioRPM("RPM");
+static const FName NAME_SteerInput("MoveRight");
+static const FName NAME_ThrottleInput("MoveFoward");
 
 #define LOCTEXT_NAMESPACE "VehiclePawn"
 
@@ -196,6 +198,10 @@ void AChaosVehiclesPawn::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAction("SwitchCamera", IE_Pressed, this, &AChaosVehiclesPawn::OnToggleCamera);
 
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AChaosVehiclesPawn::OnResetVR); 
+
+	// Bind the Enter key to a custom function
+	//PlayerInputComponent->BindKey(EKeys::Enter, IE_Pressed, this, &AChaosVehiclesPawn::OnEnterKeyPressed);
+
 }
 
 void AChaosVehiclesPawn::MoveForward(float Val)
@@ -285,6 +291,62 @@ void AChaosVehiclesPawn::Tick(float Delta)
 	float RPMToAudioScale = 2500.0f / GetVehicleMovement()->GetEngineMaxRotationSpeed();
 	EngineSoundComponent->SetFloatParameter(EngineAudioRPM, GetVehicleMovement()->GetEngineRotationSpeed()*RPMToAudioScale);
 }
+
+//void AChaosVehiclesPawn::UpdateInAirControl(float DeltaTime)
+//{
+//	if (UWheeledVehicleMovementComponent4W* Vehicle4W = CastChecked<UWheeledVehicleMovementComponent4W>(GetVehicleMovement())) {
+//		FCollisionQueryParams QueryParams;
+//		QueryParams.AddIgnoredActor(this);
+//
+//		const FVector TraceStart = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+//		const FVector TraceEnd = GetActorLocation() - FVector(0.f, 0.f, 200.f);
+//
+//		FHitResult Hit;
+//
+//		const bool bInAir = !GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, QueryParams);
+//		const bool bNotGrounded = FVector::DotProduct(GetActorUpVector(), FVector::UpVector) < 0.1f;
+//
+//		if (bInAir || bNotGrounded) {
+//			const float ForwardInput = InputComponent->GetAxisValue(NAME_ThrottleInput);
+//			const float RightInput = InputComponent->GetAxisValue(NAME_SteerInput);
+//
+//			const float AirMovementForcePitch = 3.f;
+//			const float AirMovementForceRoll = !bInAir && bNotGrounded ? 20.f : 3.f;
+//
+//			if (UPrimitiveComponent* VehicleMesh = Vehicle4W->UpdatedPrimitive) {
+//				const FVector MovementVector = FVector(RightInput * -AirMovementForceRoll, ForwardInput * AirMovementForcePitch, 0.f) * DeltaTime * 100.f;
+//				const FVector NewAngularMovement = GetActorRotation().RotateVector(MovementVector);
+//
+//				VehicleMesh->SetPhysicsAngularVelocity(NewAngularMovement, true);
+//			}
+//		}
+//	}
+//	
+//}
+
+void AChaosVehiclesPawn::ResetCarOrientation()
+{
+	// Get the current rotation of the actor
+    FRotator CurrentRotation = GetActorRotation();
+
+    // Convert the rotation to a quaternion
+    FQuat CurrentQuat = CurrentRotation.Quaternion();
+
+    // Create a quaternion for the desired upright rotation (e.g., no roll or pitch)
+    FQuat DesiredQuat = FQuat::Identity;
+
+    // Interpolate between the current rotation and the desired upright rotation over time
+    float InterpSpeed = 0.1f; // You can adjust this value as needed
+    FQuat NewQuat = FMath::QInterpTo(CurrentQuat, DesiredQuat, GetWorld()->GetDeltaSeconds(), InterpSpeed);
+
+    // Convert the interpolated quaternion back to a rotation
+    FRotator NewRotation = NewQuat.Rotator();
+
+    // Set the actor's rotation to the new interpolated rotation
+    SetActorRotation(NewRotation);
+}
+
+
 
 void AChaosVehiclesPawn::BeginPlay()
 {

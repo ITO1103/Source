@@ -29,9 +29,9 @@ void AChaosVehiclesHud::DrawHUD()
 {
     Super::DrawHUD();
 
-    // Calculate ratio from 720p
-    const float HUDXRatio = Canvas->SizeX / 1280.f;
-    const float HUDYRatio = Canvas->SizeY / 720.f;
+    // Calculate ratio from 1080p
+    const float HUDXRatio = Canvas->SizeX / 1920.f;
+    const float HUDYRatio = Canvas->SizeY / 1080.f;
 
     bool bHMDDeviceActive = false;
 
@@ -48,15 +48,15 @@ void AChaosVehiclesHud::DrawHUD()
         AChaosVehiclesPawn* Vehicle = Cast<AChaosVehiclesPawn>(GetOwningPawn());
         if ((Vehicle != nullptr) && (Vehicle->bInCarCameraActive == false))
         {
-            FVector2D ScaleVec(HUDYRatio * 1.4f, HUDYRatio * 1.4f);
+            FVector2D ScaleVec(HUDYRatio * 2.4f, HUDYRatio * 2.4f);
 
             // Speed
-            FCanvasTextItem SpeedTextItem(FVector2D(HUDXRatio * 805.f, HUDYRatio * 455), Vehicle->SpeedDisplayString, HUDFont, FLinearColor::White);
+            FCanvasTextItem SpeedTextItem(FVector2D(HUDXRatio * 1500.f, HUDYRatio * 800), Vehicle->SpeedDisplayString, HUDFont, FLinearColor::White);
             SpeedTextItem.Scale = ScaleVec;
             Canvas->DrawItem(SpeedTextItem);
 
             // Gear
-            FCanvasTextItem GearTextItem(FVector2D(HUDXRatio * 805.f, HUDYRatio * 500.f), Vehicle->GearDisplayString, HUDFont, Vehicle->bInReverseGear == false ? Vehicle->GearDisplayColor : Vehicle->GearDisplayReverseColor);
+            FCanvasTextItem GearTextItem(FVector2D(HUDXRatio * 1500.f, HUDYRatio * 860.f), Vehicle->GearDisplayString, HUDFont, Vehicle->bInReverseGear == false ? Vehicle->GearDisplayColor : Vehicle->GearDisplayReverseColor);
             GearTextItem.Scale = ScaleVec;
             Canvas->DrawItem(GearTextItem);
 
@@ -80,11 +80,11 @@ void AChaosVehiclesHud::DrawHUD()
             // •b‚Ì‚QŒ…–Ú‚ð0–„‚ß•¬”“_‘æ3ˆÊ‚Ü‚Å•\Ž¦
             FString PaddedSeconds = FString::Printf(TEXT("%06.3f"), Seconds);
 
-            ElapsedTimeText = FString::Printf(TEXT("Time: %s:%s seconds"), *PaddedMinutes, *PaddedSeconds);
+            ElapsedTimeText = FString::Printf(TEXT("Time: %s'%s"), *PaddedMinutes, *PaddedSeconds);
             
 
 
-            FVector2D ElapsedTimePos(HUDXRatio * 805.f, HUDYRatio * 545.f);
+            FVector2D ElapsedTimePos(HUDXRatio * 1500.f, HUDYRatio * 920.f);
             FCanvasTextItem ElapsedTimeTextItem(ElapsedTimePos, FText::FromString(ElapsedTimeText), HUDFont, FLinearColor::White);
             ElapsedTimeTextItem.Scale = ScaleVec;
             Canvas->DrawItem(ElapsedTimeTextItem);

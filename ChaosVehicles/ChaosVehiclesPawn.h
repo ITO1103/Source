@@ -84,6 +84,12 @@ public:
 
 	// Begin Actor interface
 	virtual void Tick(float Delta) override;
+
+	/*void UpdateInAirControl(float DeltaTime);*/
+
+	UFUNCTION(BlueprintCallable, Category = "Custom Functions")
+		void ResetCarOrientation();
+
 protected:
 	virtual void BeginPlay() override;
 
